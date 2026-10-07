@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function sslp_remote_release() {
 	$cached = get_site_transient( 'sslp_remote_release' );
-	if ( is_array( $cached ) ) {
+	if ( is_array( $cached ) && isset( $cached['version'], $cached['package'] ) ) {
 		return $cached;
 	}
 
@@ -36,7 +36,7 @@ function sslp_remote_release() {
 	);
 
 	if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
-		set_site_transient( 'sslp_remote_release', $empty, HOUR_IN_SECONDS );
+		set_site_transient( 'sslp_remote_release', $empty, 15 * MINUTE_IN_SECONDS );
 		return $empty;
 	}
 
@@ -56,60 +56,101 @@ function sslp_remote_release() {
 		}
 	}
 
+	if ( $version && ! $package ) {
+		$package = 'https://github.com/yayasanikhlas-dev/sedekah-sini-lp/releases/download/v' . rawurlencode( $version ) . '/sedekah-sini-lp.zip';
+	}
+
 	$payload = ( $version && $package ) ? array(
 		'version' => $version,
 		'package' => $package,
 	) : $empty;
 
-	set_site_transient( 'sslp_remote_release', $payload, 6 * HOUR_IN_SECONDS );
+	set_site_transient( 'sslp_remote_release', $payload, 15 * MINUTE_IN_SECONDS );
 	return $payload;
 }
 
 /**
- * Add this plugin to the WordPress update list.
+ * Update payload WordPress stores for this plugin.
  *
- * @param object $transient Update transient.
+ * @param string $version Release version.
+ * @param string $package Zip URL.
  * @return object
+ */
+function sslp_update_payload( $version, $package ) {
+	return (object) array(
+		'id'           => 'https://github.com/yayasanikhlas-dev/sedekah-sini-lp',
+		'slug'         => 'sedekah-sini-lp',
+		'plugin'       => plugin_basename( SSLP_FILE ),
+		'version'      => $version,
+		'new_version'  => $version,
+		'url'          => 'https://github.com/yayasanikhlas-dev/sedekah-sini-lp',
+		'package'      => $package,
+		'requires'     => '6.0',
+		'requires_php' => '7.4',
+		'tested'       => '6.8',
+	);
+}
+
+/**
+ * Official WordPress 5.8+ update hook for the Update URI header.
+ *
+ * @param array|false $update      Existing update data.
+ * @param array       $plugin_data Plugin headers.
+ * @param string      $plugin_file Plugin basename.
+ * @return array|false
+ */
+function sslp_github_update( $update, $plugin_data, $plugin_file ) {
+	unset( $plugin_data );
+	if ( plugin_basename( SSLP_FILE ) !== $plugin_file ) {
+		return $update;
+	}
+
+	$remote = sslp_remote_release();
+	if ( ! $remote['version'] || ! $remote['package'] ) {
+		return $update;
+	}
+
+	return (array) sslp_update_payload( $remote['version'], $remote['package'] );
+}
+add_filter( 'update_plugins_github.com', 'sslp_github_update', 10, 3 );
+
+/**
+ * Keep this plugin in the update list even between WordPress.org checks.
+ *
+ * @param mixed $transient Update transient.
+ * @return mixed
  */
 function sslp_inject_update( $transient ) {
 	if ( ! is_object( $transient ) ) {
 		return $transient;
 	}
 
-	$plugin  = plugin_basename( SSLP_FILE );
-	$remote  = sslp_remote_release();
-	$current = array(
-		'id'           => $plugin,
-		'slug'         => 'sedekah-sini-lp',
-		'plugin'       => $plugin,
-		'new_version'  => SSLP_VERSION,
-		'url'          => 'https://github.com/yayasanikhlas-dev/sedekah-sini-lp',
-		'package'      => '',
-		'requires'     => '6.0',
-		'requires_php' => '7.4',
-		'tested'       => '6.8',
-	);
+	$plugin = plugin_basename( SSLP_FILE );
+	$remote = sslp_remote_release();
+
+	if ( ! isset( $transient->response ) || ! is_array( $transient->response ) ) {
+		$transient->response = array();
+	}
+	if ( ! isset( $transient->no_update ) || ! is_array( $transient->no_update ) ) {
+		$transient->no_update = array();
+	}
+	if ( ! isset( $transient->checked ) || ! is_array( $transient->checked ) ) {
+		$transient->checked = array();
+	}
+
+	$transient->checked[ $plugin ] = SSLP_VERSION;
+	unset( $transient->response[ $plugin ], $transient->no_update[ $plugin ] );
 
 	if ( $remote['version'] && $remote['package'] && version_compare( SSLP_VERSION, $remote['version'], '<' ) ) {
-		$current['new_version'] = $remote['version'];
-		$current['package']     = $remote['package'];
-		if ( ! isset( $transient->response ) || ! is_array( $transient->response ) ) {
-			$transient->response = array();
-		}
-		$transient->response[ $plugin ] = (object) $current;
+		$transient->response[ $plugin ] = sslp_update_payload( $remote['version'], $remote['package'] );
 	} else {
-		if ( isset( $transient->response[ $plugin ] ) ) {
-			unset( $transient->response[ $plugin ] );
-		}
-		if ( ! isset( $transient->no_update ) || ! is_array( $transient->no_update ) ) {
-			$transient->no_update = array();
-		}
-		$transient->no_update[ $plugin ] = (object) $current;
+		$transient->no_update[ $plugin ] = sslp_update_payload( $remote['version'] ? $remote['version'] : SSLP_VERSION, $remote['package'] );
 	}
 
 	return $transient;
 }
 add_filter( 'site_transient_update_plugins', 'sslp_inject_update' );
+add_filter( 'pre_set_site_transient_update_plugins', 'sslp_inject_update' );
 
 /**
  * Details shown on the plugin update screen.
@@ -146,11 +187,26 @@ function sslp_plugin_info( $result, $action, $args ) {
 	$info->requires_php  = '7.4';
 	$info->sections      = array(
 		'description' => 'Widget Elementor untuk landing page Sedekah Sini.',
+		'changelog'   => '<p>' . esc_html( $info->version ) . '</p>',
 	);
 
 	return $info;
 }
 add_filter( 'plugins_api', 'sslp_plugin_info', 20, 3 );
+
+/**
+ * Ask WordPress to look for updates again after this version is installed.
+ */
+function sslp_bust_update_check() {
+	if ( get_option( 'sslp_update_bust' ) === SSLP_VERSION ) {
+		return;
+	}
+
+	delete_site_transient( 'sslp_remote_release' );
+	delete_site_transient( 'update_plugins' );
+	update_option( 'sslp_update_bust', SSLP_VERSION, false );
+}
+add_action( 'admin_init', 'sslp_bust_update_check', 1 );
 
 /**
  * Turn on WordPress auto-updates for this plugin once.
@@ -172,12 +228,44 @@ function sslp_enable_auto_update() {
 add_action( 'admin_init', 'sslp_enable_auto_update' );
 
 /**
+ * Show a clear update notice on the Plugins screen.
+ */
+function sslp_update_admin_notice() {
+	if ( ! current_user_can( 'update_plugins' ) ) {
+		return;
+	}
+
+	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+	if ( ! $screen || ! in_array( $screen->id, array( 'plugins', 'update-core' ), true ) ) {
+		return;
+	}
+
+	$remote = sslp_remote_release();
+	if ( ! $remote['version'] || ! version_compare( SSLP_VERSION, $remote['version'], '<' ) ) {
+		return;
+	}
+
+	$plugin = plugin_basename( SSLP_FILE );
+	$url    = wp_nonce_url(
+		self_admin_url( 'update.php?action=upgrade-plugin&plugin=' . rawurlencode( $plugin ) ),
+		'upgrade-plugin_' . $plugin
+	);
+
+	echo '<div class="notice notice-warning"><p>';
+	echo esc_html( sprintf( 'Sedekah Sini LP %s tersedia. Versi yang dipasang ialah %s.', $remote['version'], SSLP_VERSION ) );
+	echo ' <a href="' . esc_url( $url ) . '">Kemas kini sekarang</a>';
+	echo '</p></div>';
+}
+add_action( 'admin_notices', 'sslp_update_admin_notice' );
+
+/**
  * Forget the cached release after an update.
  *
  * @param WP_Upgrader $upgrader Upgrader instance.
  * @param array       $options  Upgrade context.
  */
 function sslp_clear_update_cache( $upgrader, $options ) {
+	unset( $upgrader );
 	if ( empty( $options['plugins'] ) || ! is_array( $options['plugins'] ) ) {
 		return;
 	}
