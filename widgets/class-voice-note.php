@@ -106,6 +106,24 @@ class SSLP_Widget_Voice_Note extends \Elementor\Widget_Base {
 			)
 		);
 
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'title_typography',
+				'label'    => 'Tipografi tajuk',
+				'selector' => '{{WRAPPER}} .sslp-voice__title',
+			)
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'time_typography',
+				'label'    => 'Tipografi masa',
+				'selector' => '{{WRAPPER}} .sslp-voice__time',
+			)
+		);
+
 		$this->add_control(
 			'play_bg',
 			array(

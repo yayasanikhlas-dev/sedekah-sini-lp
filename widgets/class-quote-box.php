@@ -69,9 +69,9 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 		$this->end_controls_section();
 
 		$this->start_controls_section(
-			'style',
+			'style_card',
 			array(
-				'label' => 'Gaya',
+				'label' => 'Kad',
 				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -122,6 +122,16 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 			)
 		);
 
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'style_eyebrow',
+			array(
+				'label' => 'Label',
+				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+			)
+		);
+
 		$this->add_control(
 			'bar_bg',
 			array(
@@ -146,6 +156,25 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 			)
 		);
 
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'eyebrow_typography',
+				'label'    => 'Tipografi label',
+				'selector' => '{{WRAPPER}} .sslp-quote__eyebrow',
+			)
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'style_quote',
+			array(
+				'label' => 'Petikan',
+				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+			)
+		);
+
 		$this->add_control(
 			'quote_color',
 			array(
@@ -155,6 +184,25 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 				'selectors' => array(
 					'{{WRAPPER}} .sslp-quote__text' => 'color: {{VALUE}};',
 				),
+			)
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'quote_typography',
+				'label'    => 'Tipografi petikan',
+				'selector' => '{{WRAPPER}} .sslp-quote__text',
+			)
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'style_cite',
+			array(
+				'label' => 'Sumber',
+				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
 			)
 		);
 
@@ -173,9 +221,9 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 		$this->add_group_control(
 			\Elementor\Group_Control_Typography::get_type(),
 			array(
-				'name'     => 'quote_typography',
-				'label'    => 'Tipografi petikan',
-				'selector' => '{{WRAPPER}} .sslp-quote__text',
+				'name'     => 'cite_typography',
+				'label'    => 'Tipografi sumber',
+				'selector' => '{{WRAPPER}} .sslp-quote__cite',
 			)
 		);
 

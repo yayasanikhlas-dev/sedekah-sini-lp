@@ -116,6 +116,15 @@ class SSLP_Widget_Video_Player extends \Elementor\Widget_Base {
 			)
 		);
 
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'badge_typography',
+				'label'    => 'Tipografi lencana',
+				'selector' => '{{WRAPPER}} .sslp-video__badge',
+			)
+		);
+
 		$this->end_controls_section();
 	}
 

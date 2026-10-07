@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Sedekah Sini LP
  * Description: Widget Elementor untuk landing page: karusel logo, tajuk highlight, pemain video, kotak petikan, dan voice note.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Sedekah Sini
  * Text Domain: sedekah-sini-lp
  * Requires at least: 6.0
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SSLP_VERSION', '1.0.2' );
+define( 'SSLP_VERSION', '1.0.3' );
 define( 'SSLP_FILE', __FILE__ );
 define( 'SSLP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'SSLP_URL', plugin_dir_url( __FILE__ ) );

@@ -204,6 +204,15 @@ class SSLP_Widget_Highlight_Heading extends \Elementor\Widget_Base {
 			)
 		);
 
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'highlight_typography',
+				'label'    => 'Tipografi highlight',
+				'selector' => '{{WRAPPER}} .sslp-heading__part--highlight',
+			)
+		);
+
 		$this->add_control(
 			'highlight_radius',
 			array(
