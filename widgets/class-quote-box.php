@@ -122,6 +122,32 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 			)
 		);
 
+		$this->add_responsive_control(
+			'card_width',
+			array(
+				'label'      => 'Lebar',
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( '%', 'px', 'vw' ),
+				'range'      => array(
+					'%'  => array(
+						'min' => 20,
+						'max' => 100,
+					),
+					'px' => array(
+						'min' => 180,
+						'max' => 1400,
+					),
+					'vw' => array(
+						'min' => 20,
+						'max' => 100,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .sslp-quote' => 'width: {{SIZE}}{{UNIT}}; max-width: 100%; margin-left: auto; margin-right: auto;',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -165,6 +191,28 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 			)
 		);
 
+		$this->add_responsive_control(
+			'eyebrow_width',
+			array(
+				'label'      => 'Lebar',
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( '%', 'px' ),
+				'range'      => array(
+					'%'  => array(
+						'min' => 10,
+						'max' => 100,
+					),
+					'px' => array(
+						'min' => 80,
+						'max' => 900,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .sslp-quote__eyebrow' => 'width: {{SIZE}}{{UNIT}}; max-width: 100%;',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -196,6 +244,28 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 			)
 		);
 
+		$this->add_responsive_control(
+			'quote_width',
+			array(
+				'label'      => 'Lebar',
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( '%', 'px' ),
+				'range'      => array(
+					'%'  => array(
+						'min' => 20,
+						'max' => 100,
+					),
+					'px' => array(
+						'min' => 120,
+						'max' => 1200,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .sslp-quote__text' => 'width: {{SIZE}}{{UNIT}}; max-width: 100%; margin-left: auto; margin-right: auto;',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -224,6 +294,28 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 				'name'     => 'cite_typography',
 				'label'    => 'Tipografi sumber',
 				'selector' => '{{WRAPPER}} .sslp-quote__cite',
+			)
+		);
+
+		$this->add_responsive_control(
+			'cite_width',
+			array(
+				'label'      => 'Lebar',
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( '%', 'px' ),
+				'range'      => array(
+					'%'  => array(
+						'min' => 10,
+						'max' => 100,
+					),
+					'px' => array(
+						'min' => 80,
+						'max' => 900,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .sslp-quote__cite' => 'width: {{SIZE}}{{UNIT}}; max-width: 100%; margin-left: auto; margin-right: auto;',
+				),
 			)
 		);
 

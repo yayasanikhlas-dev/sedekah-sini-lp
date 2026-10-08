@@ -167,7 +167,8 @@
 
 .sslp-quote {
   position: relative;
-  margin: 0;
+  box-sizing: border-box;
+  margin: 0 auto;
   padding: 40px 32px 26px;
   background: #fffdf8;
   border: 1px solid #ead9b0;
@@ -179,6 +180,7 @@
   position: absolute;
   top: 0;
   left: 50%;
+  box-sizing: border-box;
   transform: translate(-50%, -50%);
   max-width: calc(100% - 24px);
   margin: 0;
@@ -197,7 +199,8 @@
 }
 
 .sslp-quote__text {
-  margin: 0;
+  box-sizing: border-box;
+  margin: 0 auto;
   padding: 0;
   color: #1f4d32;
   font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
@@ -209,7 +212,10 @@
 
 .sslp-quote__cite {
   display: block;
+  box-sizing: border-box;
   margin-top: 18px;
+  margin-left: auto;
+  margin-right: auto;
   padding: 0;
   color: #c4962c;
   font-family: inherit;
