@@ -30,6 +30,13 @@
   padding-right: var(--sslp-logo-gap, 48px);
 }
 
+.sslp-logos__set a {
+  display: flex;
+  align-items: center;
+  line-height: 0;
+  text-decoration: none;
+}
+
 .sslp-logos__set img {
   height: var(--sslp-logo-height, 48px);
   width: auto;

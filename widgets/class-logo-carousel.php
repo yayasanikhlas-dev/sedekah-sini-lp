@@ -49,9 +49,24 @@ class SSLP_Widget_Logo_Carousel extends \Elementor\Widget_Base {
 		$repeater->add_control(
 			'name',
 			array(
-				'label'   => 'Nama',
-				'type'    => \Elementor\Controls_Manager::TEXT,
-				'default' => 'Logo',
+				'label'       => 'Nama',
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'default'     => 'Logo',
+				'description' => 'Dipakai sebagai teks alt. Ini yang dibaca enjin carian.',
+			)
+		);
+		$repeater->add_control(
+			'link',
+			array(
+				'label'       => 'Pautan',
+				'type'        => \Elementor\Controls_Manager::URL,
+				'placeholder' => 'https://',
+				'options'     => array( 'url', 'is_external', 'nofollow' ),
+				'default'     => array(
+					'url'         => '',
+					'is_external' => true,
+					'nofollow'    => false,
+				),
 			)
 		);
 
@@ -157,8 +172,9 @@ class SSLP_Widget_Logo_Carousel extends \Elementor\Widget_Base {
 					continue;
 				}
 				$logos[] = array(
-					'url' => $url,
-					'alt' => isset( $logo['name'] ) ? $logo['name'] : '',
+					'url'  => $url,
+					'alt'  => isset( $logo['name'] ) ? $logo['name'] : '',
+					'link' => ( isset( $logo['link'] ) && is_array( $logo['link'] ) ) ? $logo['link'] : array(),
 				);
 			}
 		}
@@ -184,14 +200,51 @@ class SSLP_Widget_Logo_Carousel extends \Elementor\Widget_Base {
 		foreach ( array( false, true ) as $clone ) {
 			echo $clone ? '<div class="sslp-logos__set" aria-hidden="true">' : '<div class="sslp-logos__set">';
 			foreach ( $logos as $logo ) {
-				printf(
-					'<img src="%1$s" alt="%2$s" />',
-					esc_url( $logo['url'] ),
-					esc_attr( $logo['alt'] )
-				);
+				echo $this->logo_html( $logo, ! $clone );
 			}
 			echo '</div>';
 		}
 		echo '</div></div>';
+	}
+
+	/**
+	 * One logo. The moving copy stays an image so crawlers see each link once.
+	 *
+	 * @param array $logo   Logo data.
+	 * @param bool  $linked Whether this copy may contain the real link.
+	 * @return string
+	 */
+	private function logo_html( $logo, $linked ) {
+		$img = sprintf(
+			'<img src="%1$s" alt="%2$s" />',
+			esc_url( $logo['url'] ),
+			esc_attr( $linked ? $logo['alt'] : '' )
+		);
+
+		$href = ( $linked && isset( $logo['link']['url'] ) ) ? $logo['link']['url'] : '';
+		if ( ! $href ) {
+			return $img;
+		}
+
+		$rel    = array();
+		$target = '';
+		if ( ! empty( $logo['link']['is_external'] ) ) {
+			$target = ' target="_blank"';
+			$rel[]  = 'noopener';
+			$rel[]  = 'noreferrer';
+		}
+		if ( ! empty( $logo['link']['nofollow'] ) ) {
+			$rel[] = 'nofollow';
+		}
+
+		$rel_attr = $rel ? ' rel="' . esc_attr( implode( ' ', $rel ) ) . '"' : '';
+
+		return sprintf(
+			'<a href="%1$s"%2$s%3$s>%4$s</a>',
+			esc_url( $href ),
+			$target,
+			$rel_attr,
+			$img
+		);
 	}
 }
