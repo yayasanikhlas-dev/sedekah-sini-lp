@@ -41,13 +41,21 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 		$this->add_control(
 			'layout',
 			array(
-				'label'   => 'Jenis',
-				'type'    => \Elementor\Controls_Manager::SELECT,
-				'default' => 'quote',
-				'options' => array(
-					'quote' => 'Petikan',
-					'dalil' => 'Dalil',
+				'label'       => 'Jenis',
+				'type'        => \Elementor\Controls_Manager::CHOOSE,
+				'default'     => 'quote',
+				'options'     => array(
+					'quote' => array(
+						'title' => 'Petikan',
+						'icon'  => 'eicon-blockquote',
+					),
+					'dalil' => array(
+						'title' => 'Dalil',
+						'icon'  => 'eicon-t-letter',
+					),
 				),
+				'description' => 'Dalil keluarkan dua teks: ayat Arab, kemudian makna.',
+				'toggle'      => false,
 			)
 		);
 
@@ -63,39 +71,23 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 		$this->add_control(
 			'quote',
 			array(
-				'label'     => 'Petikan',
-				'type'      => \Elementor\Controls_Manager::TEXTAREA,
-				'default'   => 'Bagi setiap penyakit ada ubatnya. Apabila betul ubatnya, maka sembuhlah ia dengan izin Allah Azza wa Jalla.',
-				'rows'      => 4,
-				'condition' => array(
-					'layout' => 'quote',
-				),
-			)
-		);
-
-		$this->add_control(
-			'arabic',
-			array(
-				'label'     => 'Ayat dalil',
-				'type'      => \Elementor\Controls_Manager::TEXTAREA,
-				'default'   => 'إِنَّ مَعَ الْعُسْرِ يُسْرًا',
-				'rows'      => 3,
-				'condition' => array(
-					'layout' => 'dalil',
-				),
+				'label'       => 'Teks 1',
+				'type'        => \Elementor\Controls_Manager::TEXTAREA,
+				'default'     => 'Bagi setiap penyakit ada ubatnya. Apabila betul ubatnya, maka sembuhlah ia dengan izin Allah Azza wa Jalla.',
+				'rows'        => 4,
+				'description' => 'Untuk dalil, ini ayat Arab.',
 			)
 		);
 
 		$this->add_control(
 			'meaning',
 			array(
-				'label'     => 'Makna',
-				'type'      => \Elementor\Controls_Manager::TEXTAREA,
-				'default'   => 'Sesungguhnya bersama kesukaran ada kemudahan.',
-				'rows'      => 3,
-				'condition' => array(
-					'layout' => 'dalil',
-				),
+				'label'       => 'Teks 2',
+				'type'        => \Elementor\Controls_Manager::TEXTAREA,
+				'default'     => '',
+				'rows'        => 3,
+				'placeholder' => 'Makna ayat',
+				'description' => 'Teks kedua. Untuk dalil, ini makna.',
 			)
 		);
 
@@ -511,27 +503,65 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 	protected function render() {
 		$settings = $this->get_settings_for_display();
 		$dalil    = isset( $settings['layout'] ) && 'dalil' === $settings['layout'];
+		$quote    = isset( $settings['quote'] ) ? trim( $settings['quote'] ) : '';
+		$meaning  = isset( $settings['meaning'] ) ? trim( $settings['meaning'] ) : '';
+		$arabic   = isset( $settings['arabic'] ) ? trim( $settings['arabic'] ) : '';
+
+		if ( $dalil && '' !== $arabic ) {
+			$quote = $arabic;
+		}
 
 		echo '<div class="sslp-quote-wrap"><blockquote class="sslp-quote">';
 		if ( ! empty( $settings['eyebrow'] ) ) {
 			printf( '<p class="sslp-quote__eyebrow">%s</p>', esc_html( $settings['eyebrow'] ) );
 		}
-		if ( $dalil ) {
-			if ( ! empty( $settings['arabic'] ) ) {
+		if ( '' !== $quote ) {
+			if ( $dalil ) {
 				printf(
 					'<p class="sslp-quote__arabic" lang="ar" dir="rtl">%s</p>',
-					esc_html( $settings['arabic'] )
+					esc_html( $quote )
 				);
+			} else {
+				printf( '<p class="sslp-quote__text">“%s”</p>', esc_html( $quote ) );
 			}
-			if ( ! empty( $settings['meaning'] ) ) {
-				printf( '<p class="sslp-quote__meaning">“%s”</p>', esc_html( $settings['meaning'] ) );
-			}
-		} elseif ( ! empty( $settings['quote'] ) ) {
-			printf( '<p class="sslp-quote__text">“%s”</p>', esc_html( $settings['quote'] ) );
+		}
+		if ( '' !== $meaning ) {
+			printf( '<p class="sslp-quote__meaning">“%s”</p>', esc_html( $meaning ) );
 		}
 		if ( ! empty( $settings['cite'] ) ) {
 			printf( '<footer class="sslp-quote__cite">%s</footer>', esc_html( $settings['cite'] ) );
 		}
 		echo '</blockquote></div>';
+	}
+
+	protected function content_template() {
+		?>
+		<#
+		var dalil = settings.layout === 'dalil';
+		var quote = settings.quote || '';
+		var meaning = settings.meaning || '';
+		if ( dalil && settings.arabic ) {
+			quote = settings.arabic;
+		}
+		#>
+		<div class="sslp-quote-wrap"><blockquote class="sslp-quote">
+			<# if ( settings.eyebrow ) { #>
+				<p class="sslp-quote__eyebrow">{{{ settings.eyebrow }}}</p>
+			<# } #>
+			<# if ( quote ) { #>
+				<# if ( dalil ) { #>
+					<p class="sslp-quote__arabic" lang="ar" dir="rtl">{{{ quote }}}</p>
+				<# } else { #>
+					<p class="sslp-quote__text">“{{{ quote }}}”</p>
+				<# } #>
+			<# } #>
+			<# if ( meaning ) { #>
+				<p class="sslp-quote__meaning">“{{{ meaning }}}”</p>
+			<# } #>
+			<# if ( settings.cite ) { #>
+				<footer class="sslp-quote__cite">{{{ settings.cite }}}</footer>
+			<# } #>
+		</blockquote></div>
+		<?php
 	}
 }
