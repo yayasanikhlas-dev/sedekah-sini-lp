@@ -39,6 +39,19 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 		);
 
 		$this->add_control(
+			'layout',
+			array(
+				'label'   => 'Jenis',
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'default' => 'quote',
+				'options' => array(
+					'quote' => 'Petikan',
+					'dalil' => 'Dalil',
+				),
+			)
+		);
+
+		$this->add_control(
 			'eyebrow',
 			array(
 				'label'   => 'Label atas',
@@ -50,10 +63,39 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 		$this->add_control(
 			'quote',
 			array(
-				'label'   => 'Petikan',
-				'type'    => \Elementor\Controls_Manager::TEXTAREA,
-				'default' => 'Bagi setiap penyakit ada ubatnya. Apabila betul ubatnya, maka sembuhlah ia dengan izin Allah Azza wa Jalla.',
-				'rows'    => 4,
+				'label'     => 'Petikan',
+				'type'      => \Elementor\Controls_Manager::TEXTAREA,
+				'default'   => 'Bagi setiap penyakit ada ubatnya. Apabila betul ubatnya, maka sembuhlah ia dengan izin Allah Azza wa Jalla.',
+				'rows'      => 4,
+				'condition' => array(
+					'layout' => 'quote',
+				),
+			)
+		);
+
+		$this->add_control(
+			'arabic',
+			array(
+				'label'     => 'Ayat dalil',
+				'type'      => \Elementor\Controls_Manager::TEXTAREA,
+				'default'   => 'إِنَّ مَعَ الْعُسْرِ يُسْرًا',
+				'rows'      => 3,
+				'condition' => array(
+					'layout' => 'dalil',
+				),
+			)
+		);
+
+		$this->add_control(
+			'meaning',
+			array(
+				'label'     => 'Makna',
+				'type'      => \Elementor\Controls_Manager::TEXTAREA,
+				'default'   => 'Sesungguhnya bersama kesukaran ada kemudahan.',
+				'rows'      => 3,
+				'condition' => array(
+					'layout' => 'dalil',
+				),
 			)
 		);
 
@@ -213,6 +255,44 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 			)
 		);
 
+		$this->add_responsive_control(
+			'eyebrow_height',
+			array(
+				'label'      => 'Tinggi kotak',
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 24,
+						'max' => 120,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .sslp-quote__eyebrow' => 'min-height: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'eyebrow_padding',
+			array(
+				'label'      => 'Ruang dalam kotak',
+				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em' ),
+				'default'    => array(
+					'top'      => '8',
+					'right'    => '18',
+					'bottom'   => '8',
+					'left'     => '18',
+					'unit'     => 'px',
+					'isLinked' => false,
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .sslp-quote__eyebrow' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -262,6 +342,112 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 				),
 				'selectors'  => array(
 					'{{WRAPPER}} .sslp-quote__text' => 'width: {{SIZE}}{{UNIT}}; max-width: 100%; margin-left: auto; margin-right: auto;',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'style_arabic',
+			array(
+				'label' => 'Ayat dalil',
+				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_control(
+			'arabic_color',
+			array(
+				'label'     => 'Warna ayat',
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'default'   => '#1f4d32',
+				'selectors' => array(
+					'{{WRAPPER}} .sslp-quote__arabic' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'arabic_typography',
+				'label'    => 'Tipografi ayat',
+				'selector' => '{{WRAPPER}} .sslp-quote__arabic',
+			)
+		);
+
+		$this->add_responsive_control(
+			'arabic_width',
+			array(
+				'label'      => 'Lebar',
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( '%', 'px' ),
+				'range'      => array(
+					'%'  => array(
+						'min' => 20,
+						'max' => 100,
+					),
+					'px' => array(
+						'min' => 120,
+						'max' => 1200,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .sslp-quote__arabic' => 'width: {{SIZE}}{{UNIT}}; max-width: 100%; margin-left: auto; margin-right: auto;',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'style_meaning',
+			array(
+				'label' => 'Makna',
+				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_control(
+			'meaning_color',
+			array(
+				'label'     => 'Warna makna',
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'default'   => '#1f4d32',
+				'selectors' => array(
+					'{{WRAPPER}} .sslp-quote__meaning' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'meaning_typography',
+				'label'    => 'Tipografi makna',
+				'selector' => '{{WRAPPER}} .sslp-quote__meaning',
+			)
+		);
+
+		$this->add_responsive_control(
+			'meaning_width',
+			array(
+				'label'      => 'Lebar',
+				'type'       => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => array( '%', 'px' ),
+				'range'      => array(
+					'%'  => array(
+						'min' => 20,
+						'max' => 100,
+					),
+					'px' => array(
+						'min' => 120,
+						'max' => 1200,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .sslp-quote__meaning' => 'width: {{SIZE}}{{UNIT}}; max-width: 100%; margin-left: auto; margin-right: auto;',
 				),
 			)
 		);
@@ -324,11 +510,23 @@ class SSLP_Widget_Quote_Box extends \Elementor\Widget_Base {
 
 	protected function render() {
 		$settings = $this->get_settings_for_display();
+		$dalil    = isset( $settings['layout'] ) && 'dalil' === $settings['layout'];
+
 		echo '<div class="sslp-quote-wrap"><blockquote class="sslp-quote">';
 		if ( ! empty( $settings['eyebrow'] ) ) {
 			printf( '<p class="sslp-quote__eyebrow">%s</p>', esc_html( $settings['eyebrow'] ) );
 		}
-		if ( ! empty( $settings['quote'] ) ) {
+		if ( $dalil ) {
+			if ( ! empty( $settings['arabic'] ) ) {
+				printf(
+					'<p class="sslp-quote__arabic" lang="ar" dir="rtl">%s</p>',
+					esc_html( $settings['arabic'] )
+				);
+			}
+			if ( ! empty( $settings['meaning'] ) ) {
+				printf( '<p class="sslp-quote__meaning">“%s”</p>', esc_html( $settings['meaning'] ) );
+			}
+		} elseif ( ! empty( $settings['quote'] ) ) {
 			printf( '<p class="sslp-quote__text">“%s”</p>', esc_html( $settings['quote'] ) );
 		}
 		if ( ! empty( $settings['cite'] ) ) {

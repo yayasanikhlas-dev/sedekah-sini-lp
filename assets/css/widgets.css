@@ -187,6 +187,9 @@
   position: absolute;
   top: 0;
   left: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   box-sizing: border-box;
   transform: translate(-50%, -50%);
   max-width: calc(100% - 24px);
@@ -205,7 +208,8 @@
   text-transform: uppercase;
 }
 
-.sslp-quote__text {
+.sslp-quote__text,
+.sslp-quote__meaning {
   box-sizing: border-box;
   margin: 0 auto;
   padding: 0;
@@ -215,6 +219,19 @@
   font-style: italic;
   font-weight: 500;
   line-height: 1.5;
+}
+
+.sslp-quote__arabic {
+  box-sizing: border-box;
+  margin: 0 auto 14px;
+  padding: 0;
+  color: #1f4d32;
+  direction: rtl;
+  font-family: "Traditional Arabic", "Scheherazade New", "Noto Naskh Arabic", "Arabic Typesetting", serif;
+  font-size: 30px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1.9;
 }
 
 .sslp-quote__cite {
