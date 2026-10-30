@@ -48,6 +48,7 @@ class SSLP_Widget_Voice_Note extends \Elementor\Widget_Base {
 				'label'       => 'Fail audio',
 				'type'        => \Elementor\Controls_Manager::MEDIA,
 				'media_types' => array( 'audio' ),
+				'description' => 'Untuk kecilkan fail: Media Library > paparan senarai > Compress voice note, kemudian pilih salinan (voice 64k). Memerlukan FFmpeg pada hosting. Fail asal dikekalkan.',
 			)
 		);
 
@@ -57,6 +58,19 @@ class SSLP_Widget_Voice_Note extends \Elementor\Widget_Base {
 				'label'   => 'Tajuk',
 				'type'    => \Elementor\Controls_Manager::TEXT,
 				'default' => 'Dengar pesanan kami',
+			)
+		);
+
+		$this->add_control(
+			'autoplay',
+			array(
+				'label'        => 'Autoplay',
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => 'ON',
+				'label_off'    => 'OFF',
+				'return_value' => 'yes',
+				'default'      => '',
+				'description'  => 'Cuba main audio secara automatik. Jika disekat pelayar, cuba semula selepas klik, sentuhan atau kekunci pengguna.',
 			)
 		);
 
@@ -175,7 +189,8 @@ class SSLP_Widget_Voice_Note extends \Elementor\Widget_Base {
 			return;
 		}
 
-		echo '<div class="sslp-voice" data-sslp-voice>';
+		$autoplay = isset( $settings['autoplay'] ) && 'yes' === $settings['autoplay'];
+		printf( '<div class="sslp-voice" data-sslp-voice data-autoplay="%s">', $autoplay ? 'yes' : 'no' );
 		echo '<button type="button" class="sslp-voice__play" aria-label="Main audio"></button>';
 		echo '<span class="sslp-voice__body">';
 		printf( '<span class="sslp-voice__title">%s</span>', esc_html( $title ) );
