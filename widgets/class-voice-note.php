@@ -60,6 +60,19 @@ class SSLP_Widget_Voice_Note extends \Elementor\Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'autoplay',
+			array(
+				'label'        => 'Autoplay',
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => 'ON',
+				'label_off'    => 'OFF',
+				'return_value' => 'yes',
+				'default'      => '',
+				'description'  => 'Cuba main audio secara automatik. Jika disekat pelayar, cuba semula selepas klik, sentuhan atau kekunci pengguna.',
+			)
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -175,7 +188,8 @@ class SSLP_Widget_Voice_Note extends \Elementor\Widget_Base {
 			return;
 		}
 
-		echo '<div class="sslp-voice" data-sslp-voice>';
+		$autoplay = isset( $settings['autoplay'] ) && 'yes' === $settings['autoplay'];
+		printf( '<div class="sslp-voice" data-sslp-voice data-autoplay="%s">', $autoplay ? 'yes' : 'no' );
 		echo '<button type="button" class="sslp-voice__play" aria-label="Main audio"></button>';
 		echo '<span class="sslp-voice__body">';
 		printf( '<span class="sslp-voice__title">%s</span>', esc_html( $title ) );

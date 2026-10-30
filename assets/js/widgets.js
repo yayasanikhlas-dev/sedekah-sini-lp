@@ -68,6 +68,51 @@
     }
     root.setAttribute("data-sslp-ready", "voice");
 
+    var awaitingInteraction = false;
+    var interactionEvents = ["click", "touchend", "keydown"];
+
+    function cancelAutoplay() {
+      awaitingInteraction = false;
+      interactionEvents.forEach(function (eventName) {
+        document.removeEventListener(eventName, retryAutoplay);
+      });
+    }
+
+    function retryAutoplay(event) {
+      if (!root.isConnected) {
+        cancelAutoplay();
+        return;
+      }
+      // Explicit player controls take precedence over pending autoplay.
+      if (event.target && event.target.closest && event.target.closest("[data-sslp-voice]")) {
+        cancelAutoplay();
+        return;
+      }
+      if (event.isTrusted && awaitingInteraction) {
+        cancelAutoplay();
+        playAudio(false);
+      }
+    }
+
+    function playAudio(autoplay) {
+      function failed(error) {
+        if (autoplay && error && error.name === "NotAllowedError" && root.isConnected) {
+          awaitingInteraction = true;
+          interactionEvents.forEach(function (eventName) {
+            document.addEventListener(eventName, retryAutoplay);
+          });
+        }
+      }
+      try {
+        var pending = audio.play();
+        if (pending && pending.catch) {
+          pending.catch(failed);
+        }
+      } catch (error) {
+        failed(error);
+      }
+    }
+
     function paint() {
       var duration = audio.duration;
       var current = audio.currentTime || 0;
@@ -82,37 +127,40 @@
     audio.addEventListener("loadedmetadata", paint);
     audio.addEventListener("timeupdate", paint);
     audio.addEventListener("play", function () {
+      cancelAutoplay();
+      document.querySelectorAll("[data-sslp-voice] audio").forEach(function (other) {
+        if (other !== audio) {
+          other.pause();
+        }
+      });
       root.classList.add("is-playing");
+      button.setAttribute("aria-label", "Jeda audio");
     });
     audio.addEventListener("pause", function () {
       root.classList.remove("is-playing");
+      button.setAttribute("aria-label", "Main audio");
       paint();
     });
     audio.addEventListener("ended", function () {
       root.classList.remove("is-playing");
+      button.setAttribute("aria-label", "Main audio");
       audio.currentTime = 0;
       paint();
     });
 
     button.addEventListener("click", function () {
+      cancelAutoplay();
       if (audio.paused) {
-        document.querySelectorAll("[data-sslp-voice] audio").forEach(function (other) {
-          if (other !== audio) {
-            other.pause();
-          }
-        });
-        var pending = audio.play();
-        if (pending && pending.catch) {
-          pending.catch(function () {
-            root.classList.remove("is-playing");
-          });
-        }
+        playAudio(false);
       } else {
         audio.pause();
       }
     });
 
     paint();
+    if (root.getAttribute("data-autoplay") === "yes") {
+      playAudio(true);
+    }
   }
 
   function boot(scope) {
