@@ -48,6 +48,7 @@ class SSLP_Widget_Voice_Note extends \Elementor\Widget_Base {
 				'label'       => 'Fail audio',
 				'type'        => \Elementor\Controls_Manager::MEDIA,
 				'media_types' => array( 'audio' ),
+				'description' => 'Untuk kecilkan fail: Media Library > paparan senarai > Compress voice note, kemudian pilih salinan (voice 64k). Memerlukan FFmpeg pada hosting. Fail asal dikekalkan.',
 			)
 		);
 
